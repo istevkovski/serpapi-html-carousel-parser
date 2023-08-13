@@ -5,6 +5,9 @@ class CarouselParser
 		@html = html
 	end
 
+	# Based on the layout type run a different parsing
+
+
 	# Parser purpose:
 	# Extract item name, extensions array (data), Google Link and thumbnails
 	def parse
@@ -14,14 +17,21 @@ class CarouselParser
 			artworks: []
 		}
 
-		# Select the carousel items
-		items = doc.css('.klitem')
+		# Get the carousel
+		carousel = doc.css("g-scrolling-carousel");
+		# Get the carousel items
+		items = carousel.css("a");
+
+		puts items[0].css()
 
 		items.each do |item|
-			item_name = item.css('*:nth-child(2) > *:nth-child(1)').text.strip
-			item_extensions = item.css('*:nth-child(2) > *:nth-child(2)').text.strip
-			item_link = "https://google.com#{item["href"]}"
-			item_image = item.css("img")[0]["data-key"]
+			# Get the carousel description
+			item_content = item.css('*:nth-child(2)');
+
+			item_name = item_content.css('> *:nth-child(1)').text.strip
+			item_extensions = item_content.css('> *:nth-child(2)').text.strip
+			item_link = item["href"] ? "https://google.com#{item["href"]}" : nil
+			item_image = item.css("img")[0] ? item.css("img")[0]["data-key"] : nil
 
 			collection[:artworks] << {
 				name: item_name,
@@ -31,7 +41,7 @@ class CarouselParser
 			}
 		end
 
-		puts collection[:artworks][0]
+		# puts collection[:artworks][0]
 
 		# Return an array containing the extracted data
 		collection
