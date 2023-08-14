@@ -13,14 +13,15 @@ class Main
     # File.write(File.join(__dir__, '../files/export.json'), result)
   end
 
-  collection = []
   def parse_automated
+    collection = []
     parsers = [KlitemParser]
 
-    parsers.each do |parser_class|
-      parser = parser_class.new(@html)
-      result = parser.parse
-      puts result[0]
+    parsers.each do |current_parser|
+      parser = current_parser.new(@html)
+      collection = parser.parse if parser.is_suitable
+
+      puts collection
     end
   end
 end

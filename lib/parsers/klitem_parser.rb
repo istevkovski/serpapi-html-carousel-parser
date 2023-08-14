@@ -3,6 +3,8 @@ require 'base64'
 require 'open-uri'
 require_relative '../carousel_parser'
 
+GOOGLE_DOMAIN = 'https://www.google.com'
+
 class KlitemParser < CarouselParser
   def parse
     doc = Nokogiri::HTML(@html)
@@ -14,10 +16,18 @@ class KlitemParser < CarouselParser
 
     collection[:artworks] = create_collection(items)
 
-    puts collection[:artworks][0]
-
     # Return an array containing the extracted data
     JSON.pretty_generate(collection)
+  end
+
+  # Checks if the parser is suitable to the html file
+  # Criteria: carousel and items must exist
+  def is_suitable
+    doc = Nokogiri::HTML(@html)
+    carousel = get_carousel(doc)
+    items = get_items(carousel)
+
+    items.length and items[0]&.children&.length == 2
   end
 
   private
@@ -27,16 +37,18 @@ class KlitemParser < CarouselParser
   end
 
   def get_carousel(doc)
-    doc.css('g-scrolling-carousel')
+    return nil unless doc.respond_to?(:css)
+
+    doc&.css('g-scrolling-carousel')
   end
 
   def get_items(carousel)
     # Select every a-tag containing the substring klitem
-    carousel.css('a[class*=klitem]')
+    carousel&.css('a[class*=klitem]') || []
   end
 
   def get_item_name(item)
-    item.css('*:nth-child(2)').children[0].text.strip
+    item&.css('*:nth-child(2)')&.children&.[](0)&.text&.strip
   end
 
   def get_extensions(item)
@@ -50,11 +62,11 @@ class KlitemParser < CarouselParser
   end
 
   def get_link(item)
-    item['href'] ? "https://www.google.com#{item['href']}" : nil
+    item['href'] ? "#{GOOGLE_DOMAIN}#{item['href']}" : nil
   end
 
   def get_thumbnail(item)
-    thumbnail_link = item.css('img')[0]['data-key']
+    thumbnail_link = item&.css('img')&.[](0)&.[]('data-key')
     return nil unless thumbnail_link
 
     thumbnail = URI.open(thumbnail_link, 'rb') { |f| f.read }

@@ -11,6 +11,10 @@ class CarouselParser
     raise NotImplementedError, "Subclasses have to implement 'parse' method."
   end
 
+  def is_suitable
+    raise NotImplementedError, "Subclasses have to implement 'is_suitable' method."
+  end
+
   private
 
   def create_collection(items)
