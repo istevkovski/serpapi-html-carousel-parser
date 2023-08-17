@@ -1,5 +1,7 @@
 require 'nokogiri'
 
+GOOGLE_DOMAIN = 'https://www.google.com'
+
 # Class: CarouselParser
 # Public interface for parsing input data and extracting relevant information.
 class CarouselParser
