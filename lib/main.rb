@@ -7,13 +7,6 @@ class Main
     @html = html
   end
 
-  def parse
-    parser = KlitemParser.new(@html)
-    result = parser.parse
-
-    # File.write(File.join(__dir__, '../files/export.json'), result)
-  end
-
   def parse_automated
     parsers = [KlitemParser, KlitemParser2023]
     collection = []
